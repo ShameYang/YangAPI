@@ -16,6 +16,7 @@ import com.shameyang.yangapi.model.entity.InterfaceInfo;
 import com.shameyang.yangapi.model.entity.User;
 import com.shameyang.yangapi.service.InterfaceInfoService;
 import com.shameyang.yangapi.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +49,7 @@ public class InterfaceInfoController {
      * @return
      */
     @PostMapping("/add")
+    @Operation(summary = "创建接口")
     public BaseResponse<Long> addInterfaceInfo(@RequestBody InterfaceInfoAddRequest addRequest, HttpServletRequest request) {
         if (addRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -72,6 +74,7 @@ public class InterfaceInfoController {
      * @return
      */
     @PostMapping("/delete")
+    @Operation(summary = "删除接口")
     public BaseResponse<Boolean> deleteInterfaceInfo(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -89,6 +92,7 @@ public class InterfaceInfoController {
      * @return
      */
     @PostMapping("/update")
+    @Operation(summary = "更新接口")
     public BaseResponse<Boolean> updateInterfaceInfo(@RequestBody InterfaceInfoUpdateRequest updateRequest, HttpServletRequest request) {
         if (updateRequest == null || updateRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -110,6 +114,7 @@ public class InterfaceInfoController {
      * @return
      */
     @GetMapping("/get")
+    @Operation(summary = "根据 id 查询接口")
     public BaseResponse<InterfaceInfo> getInterfaceInfoById(long id) {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -126,6 +131,7 @@ public class InterfaceInfoController {
      */
     @AuthCheck(mustRole = "admin")
     @GetMapping("/list")
+    @Operation(summary = "获取接口列表")
     public BaseResponse<List<InterfaceInfo>> listInterfaceInfo(InterfaceInfoQueryRequest queryRequest) {
         InterfaceInfo interfaceInfoQuery = new InterfaceInfo();
         if (queryRequest != null) {
@@ -144,6 +150,7 @@ public class InterfaceInfoController {
      * @return
      */
     @GetMapping("/list/page")
+    @Operation(summary = "分页获取接口列表")
     public BaseResponse<Page<InterfaceInfo>> listInterfaceInfoByPage(InterfaceInfoQueryRequest queryRequest, HttpServletRequest request) {
         if (queryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
