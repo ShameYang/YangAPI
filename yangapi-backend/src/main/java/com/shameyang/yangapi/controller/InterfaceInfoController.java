@@ -3,10 +3,7 @@ package com.shameyang.yangapi.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.shameyang.yangapi.annotation.AuthCheck;
-import com.shameyang.yangapi.common.BaseResponse;
-import com.shameyang.yangapi.common.DeleteRequest;
-import com.shameyang.yangapi.common.ErrorCode;
-import com.shameyang.yangapi.common.ResultUtils;
+import com.shameyang.yangapi.common.*;
 import com.shameyang.yangapi.constant.CommonConstant;
 import com.shameyang.yangapi.exception.BusinessException;
 import com.shameyang.yangapi.model.dto.interfaceinfo.InterfaceInfoAddRequest;
@@ -14,8 +11,10 @@ import com.shameyang.yangapi.model.dto.interfaceinfo.InterfaceInfoQueryRequest;
 import com.shameyang.yangapi.model.dto.interfaceinfo.InterfaceInfoUpdateRequest;
 import com.shameyang.yangapi.model.entity.InterfaceInfo;
 import com.shameyang.yangapi.model.entity.User;
+import com.shameyang.yangapi.model.enums.InterfaceInfoStatusEnum;
 import com.shameyang.yangapi.service.InterfaceInfoService;
 import com.shameyang.yangapi.service.UserService;
+import com.shameyang.yangapiclientsdk.client.YangApiClient;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,10 +36,13 @@ import java.util.List;
 public class InterfaceInfoController {
 
     @Resource
-    InterfaceInfoService interfaceInfoService;
+    private InterfaceInfoService interfaceInfoService;
 
     @Resource
-    UserService userService;
+    private UserService userService;
+
+    @Resource
+    private YangApiClient yangApiClient;
 
     /**
      * 创建
@@ -192,5 +194,63 @@ public class InterfaceInfoController {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         return oldInterfaceInfo;
+    }
+
+    /**
+     * 发布
+     * @param idRequest
+     * @return
+     */
+    @PostMapping("/online")
+    @Operation(summary = "发布接口")
+    @AuthCheck(mustRole = "admin")
+    public BaseResponse<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest) {
+        if (idRequest == null || idRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        long id = idRequest.getId();
+        // 判断是否存在
+        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
+        if (oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        // 判断该接口是否可以调用
+        com.shameyang.yangapiclientsdk.model.User user = new com.shameyang.yangapiclientsdk.model.User();
+        user.setUsername("test");
+        String username = yangApiClient.getUsernameByPost(user);
+        if (StringUtils.isBlank(username)) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "接口验证失败");
+        }
+        // 仅本人或管理员可修改
+        InterfaceInfo interfaceInfo = new InterfaceInfo();
+        interfaceInfo.setId(id);
+        interfaceInfo.setStatus(InterfaceInfoStatusEnum.ONLINE.getValue());
+        boolean result = interfaceInfoService.updateById(interfaceInfo);
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 下线
+     * @param idRequest
+     * @return
+     */
+    @PostMapping("/offline")
+    @Operation(summary = "下线接口")
+    public BaseResponse<Boolean> offlineInterfaceInfo(@RequestBody IdRequest idRequest) {
+        if (idRequest == null || idRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        long id = idRequest.getId();
+        // 判断是否存在
+        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
+        if (oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        // 仅本人或管理员可修改
+        InterfaceInfo interfaceInfo = new InterfaceInfo();
+        interfaceInfo.setId(id);
+        interfaceInfo.setStatus(InterfaceInfoStatusEnum.OFFLINE.getValue());
+        boolean result = interfaceInfoService.updateById(interfaceInfo);
+        return ResultUtils.success(result);
     }
 }
