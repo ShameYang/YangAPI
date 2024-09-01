@@ -62,10 +62,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             }
             // 2. 加密
             String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
-            // 3. 插入数据
+            // 3. 分配 accessKey, secretKey
+            String accessKey = DigestUtil.md5Hex(SALT + userAccount + RandomUtil.randomNumbers(5));
+            String secretKey = DigestUtil.md5Hex(SALT + userAccount + RandomUtil.randomNumbers(8));
+            // 4. 插入数据
             User user = new User();
             user.setUserAccount(userAccount);
             user.setUserPassword(encryptPassword);
+            user.setAccessKey(accessKey);
+            user.setSecretKey(secretKey);
             boolean saveResult = this.save(user);
             if (!saveResult) {
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");
