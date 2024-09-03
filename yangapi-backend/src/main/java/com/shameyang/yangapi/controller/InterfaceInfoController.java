@@ -2,11 +2,13 @@ package com.shameyang.yangapi.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.gson.Gson;
 import com.shameyang.yangapi.annotation.AuthCheck;
 import com.shameyang.yangapi.common.*;
 import com.shameyang.yangapi.constant.CommonConstant;
 import com.shameyang.yangapi.exception.BusinessException;
 import com.shameyang.yangapi.model.dto.interfaceinfo.InterfaceInfoAddRequest;
+import com.shameyang.yangapi.model.dto.interfaceinfo.InterfaceInfoInvokeRequest;
 import com.shameyang.yangapi.model.dto.interfaceinfo.InterfaceInfoQueryRequest;
 import com.shameyang.yangapi.model.dto.interfaceinfo.InterfaceInfoUpdateRequest;
 import com.shameyang.yangapi.model.entity.InterfaceInfo;
@@ -252,5 +254,38 @@ public class InterfaceInfoController {
         interfaceInfo.setStatus(InterfaceInfoStatusEnum.OFFLINE.getValue());
         boolean result = interfaceInfoService.updateById(interfaceInfo);
         return ResultUtils.success(result);
+    }
+
+    /**
+     * 测试调用
+     *
+     * @param interfaceInfoInvokeRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/invoke")
+    public BaseResponse<Object> invokeInterfaceInfo(@RequestBody InterfaceInfoInvokeRequest interfaceInfoInvokeRequest,
+                                                    HttpServletRequest request) {
+        if (interfaceInfoInvokeRequest == null || interfaceInfoInvokeRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        String userRequestParams = interfaceInfoInvokeRequest.getUserRequestParams();
+        long id = interfaceInfoInvokeRequest.getId();
+        // 判断是否存在
+        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
+        if (oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        if (oldInterfaceInfo.getStatus() == InterfaceInfoStatusEnum.OFFLINE.getValue()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "接口已关闭");
+        }
+        User loginUser = userService.getLoginUser(request);
+        String accessKey = loginUser.getAccessKey();
+        String secretKey = loginUser.getSecretKey();
+        YangApiClient tempClient = new YangApiClient(accessKey, secretKey);
+        Gson gson = new Gson();
+        com.shameyang.yangapiclientsdk.model.User user = gson.fromJson(userRequestParams, com.shameyang.yangapiclientsdk.model.User.class);
+        String usernameByPost = tempClient.getUsernameByPost(user);
+        return ResultUtils.success(usernameByPost);
     }
 }
