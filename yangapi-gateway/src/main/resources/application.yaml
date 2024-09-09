@@ -1,0 +1,18 @@
+server:
+  port: 8081
+spring:
+  cloud:
+    gateway:
+      default-filters:
+        - AddResponseHeader=source, shameyang
+      routes:
+        - id: api_route
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/**
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: trace
