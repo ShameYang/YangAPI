@@ -60,7 +60,7 @@ if (pwa) {
       <Button
         type="primary"
         onClick={() => {
-          notification.destroy(key);
+          notification.close(key);
           reloadSW();
         }}
       >

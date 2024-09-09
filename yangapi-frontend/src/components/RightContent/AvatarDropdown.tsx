@@ -1,65 +1,19 @@
-import { outLogin } from '@/services/ant-design-pro/api';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { history, useModel } from '@umijs/max';
-import { Spin } from 'antd';
-import { createStyles } from 'antd-style';
-import { stringify } from 'querystring';
+import { Avatar, Menu, Spin } from 'antd';
+import type { ItemType } from 'antd/es/menu/hooks/useItems';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import React, { useCallback } from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
+import styles from './index.less';
+import {userLogoutUsingPOST} from "@/services/yangapi-backend/userController";
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
-  children?: React.ReactNode;
 };
 
-export const AvatarName = () => {
-  const { initialState } = useModel('@@initialState');
-  const { currentUser } = initialState || {};
-  return <span className="anticon">{currentUser?.name}</span>;
-};
-
-const useStyles = createStyles(({ token }) => {
-  return {
-    action: {
-      display: 'flex',
-      height: '48px',
-      marginLeft: 'auto',
-      overflow: 'hidden',
-      alignItems: 'center',
-      padding: '0 8px',
-      cursor: 'pointer',
-      borderRadius: token.borderRadius,
-      '&:hover': {
-        backgroundColor: token.colorBgTextHover,
-      },
-    },
-  };
-});
-
-export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, children }) => {
-  /**
-   * 退出登录，并且将当前的 url 保存
-   */
-  const loginOut = async () => {
-    await outLogin();
-    const { search, pathname } = window.location;
-    const urlParams = new URL(window.location.href).searchParams;
-    /** 此方法会跳转到 redirect 参数所在的位置 */
-    const redirect = urlParams.get('redirect');
-    // Note: There may be security issues, please note
-    if (window.location.pathname !== '/user/login' && !redirect) {
-      history.replace({
-        pathname: '/user/login',
-        search: stringify({
-          redirect: pathname + search,
-        }),
-      });
-    }
-  };
-  const { styles } = useStyles();
-
+const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
   const { initialState, setInitialState } = useModel('@@initialState');
 
   const onMenuClick = useCallback(
@@ -67,9 +21,12 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
       const { key } = event;
       if (key === 'logout') {
         flushSync(() => {
-          setInitialState((s) => ({ ...s, currentUser: undefined }));
+          setInitialState((s) => ({ ...s, loginUser: undefined }));
         });
-        loginOut();
+        userLogoutUsingPOST();
+        const { search, pathname } = window.location;
+        const redirect = pathname + search;
+        history.replace('/user/login', {redirect});
         return;
       }
       history.push(`/account/${key}`);
@@ -78,7 +35,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
   );
 
   const loading = (
-    <span className={styles.action}>
+    <span className={`${styles.action} ${styles.account}`}>
       <Spin
         size="small"
         style={{
@@ -93,13 +50,13 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     return loading;
   }
 
-  const { currentUser } = initialState;
+  const { loginUser } = initialState;
 
-  if (!currentUser || !currentUser.name) {
+  if (!loginUser || !loginUser.userName) {
     return loading;
   }
 
-  const menuItems = [
+  const menuItems: ItemType[] = [
     ...(menu
       ? [
           {
@@ -124,15 +81,18 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     },
   ];
 
+  const menuHeaderDropdown = (
+    <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick} items={menuItems} />
+  );
+
   return (
-    <HeaderDropdown
-      menu={{
-        selectedKeys: [],
-        onClick: onMenuClick,
-        items: menuItems,
-      }}
-    >
-      {children}
+    <HeaderDropdown overlay={menuHeaderDropdown}>
+      <span className={`${styles.action} ${styles.account}`}>
+        <Avatar size="small" className={styles.avatar} src={loginUser.userAvatar} alt="avatar" />
+        <span className={`${styles.name} anticon`}>{loginUser.userName}</span>
+      </span>
     </HeaderDropdown>
   );
 };
+
+export default AvatarDropdown;
