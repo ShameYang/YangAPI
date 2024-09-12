@@ -1,7 +1,7 @@
 package com.shameyang.yangapi.mapper;
 
-import com.shameyang.yangapi.model.entity.InterfaceInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.shameyang.yangapicommon.model.entity.InterfaceInfo;
 
 /**
 * @author shameyang
@@ -12,7 +12,3 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface InterfaceInfoMapper extends BaseMapper<InterfaceInfo> {
 
 }
-
-
-
-

@@ -3,9 +3,9 @@ package com.shameyang.yangapi.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.shameyang.yangapi.common.ErrorCode;
 import com.shameyang.yangapi.exception.BusinessException;
-import com.shameyang.yangapi.model.entity.InterfaceInfo;
 import com.shameyang.yangapi.service.InterfaceInfoService;
 import com.shameyang.yangapi.mapper.InterfaceInfoMapper;
+import com.shameyang.yangapicommon.model.entity.InterfaceInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 

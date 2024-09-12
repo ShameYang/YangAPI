@@ -1,7 +1,7 @@
 package com.shameyang.yangapi.service;
 
-import com.shameyang.yangapi.model.entity.UserInterfaceInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.shameyang.yangapicommon.model.entity.UserInterfaceInfo;
 
 /**
 * @author shameyang
@@ -16,4 +16,12 @@ public interface UserInterfaceInfoService extends IService<UserInterfaceInfo> {
      * @param add
      */
     void validUserInterfaceInfo(UserInterfaceInfo userInterfaceInfo, boolean add);
+
+    /**
+     * 调用接口统计
+     * @param interfaceInfoId
+     * @param userId
+     * @return
+     */
+    boolean invokeCount(long interfaceInfoId, long userId);
 }

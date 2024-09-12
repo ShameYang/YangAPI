@@ -1,7 +1,7 @@
 package com.shameyang.yangapi.mapper;
 
-import com.shameyang.yangapi.model.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.shameyang.yangapicommon.model.entity.User;
 
 /**
 * @author shameyang

@@ -1,7 +1,7 @@
 package com.shameyang.yangapi.service;
 
-import com.shameyang.yangapi.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.shameyang.yangapicommon.model.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
