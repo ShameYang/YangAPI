@@ -8,12 +8,14 @@ import com.shameyang.yangapicommon.model.entity.User;
 import com.shameyang.yangapicommon.service.InnerUserService;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboService;
 
 /**
  * @author ShameYang
  * @date 2024/9/12 19:14
  * @description 内部用户服务实现类
  */
+@DubboService
 public class InnerUserServiceImpl implements InnerUserService {
 
     @Resource

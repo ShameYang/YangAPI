@@ -8,12 +8,14 @@ import com.shameyang.yangapicommon.model.entity.InterfaceInfo;
 import com.shameyang.yangapicommon.service.InnerInterfaceInfoService;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboService;
 
 /**
  * @author ShameYang
  * @date 2024/9/12 19:14
  * @description 内部接口信息服务实现类
  */
+@DubboService
 public class InnerInterfaceInfoServiceImpl implements InnerInterfaceInfoService {
 
     @Resource
