@@ -10,6 +10,8 @@ create table if not exists user
     create_time   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
     update_time   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     is_delete     tinyint      default 0                 not null comment '是否删除',
+    access_key    varchar(512)                           not null comment 'accessKey',
+    secret_key    varchar(512)                           not null comment 'secret_key',
     constraint uni_user_account
         unique (user_account)
 ) comment '用户';
