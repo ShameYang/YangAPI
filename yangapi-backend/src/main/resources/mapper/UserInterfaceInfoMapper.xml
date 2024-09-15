@@ -21,4 +21,9 @@
         total_num,left_num,status,
         create_time,update_time,is_delete
     </sql>
+    <select id="listTopInvokeInterfaceInfo"
+            resultType="com.shameyang.yangapicommon.model.entity.UserInterfaceInfo">
+        select interface_info_id, sum(total_num) as total_num from user_interface_info
+        group by interface_info_id order by total_num desc limit #{limit};
+    </select>
 </mapper>
